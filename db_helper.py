@@ -1,15 +1,5 @@
 import pymysql
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_NAME = os.getenv("DB_NAME")
-
+import streamlit as st
 
 class DB:
 
@@ -17,11 +7,11 @@ class DB:
         # connect to the database server
 
         self.conn = pymysql.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME,
-            port=int(DB_PORT)
+            host=st.secrets["DB_HOST"],
+            user=st.secrets["DB_USER"],
+            password=st.secrets["DB_PASSWORD"],
+            database=st.secrets["DB_NAME"],
+            port=int(st.secrets["DB_PORT"])
         )
 
         self.mycursor = self.conn.cursor()

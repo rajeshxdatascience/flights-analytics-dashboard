@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 crud.py
 demo.py
+.streamlit
+test_db.py
+upload_to_aws.py
