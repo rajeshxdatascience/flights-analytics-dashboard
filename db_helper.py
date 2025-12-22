@@ -32,130 +32,42 @@ class DB:
 
         return city
     
-    def get_flight_details(self, source, destination):
+    def get_flights_filtered(self, source, destination, stops=None, travel_class=None):
 
         query = """
             SELECT flight, airline, departure_time, stops, arrival_time, 
-		    class, duration, days_left, price
-            FROM ( SELECT nf.*,
+                class, duration, days_left, price
+            FROM (
+                SELECT nf.*,
                     ROW_NUMBER() OVER (
-                    PARTITION BY flight
-                    ORDER BY price ASC, days_left ASC) AS rn
-		            FROM new_flights nf
-		            WHERE source_city = %s
-		            AND destination_city = %s) t
-        
-            WHERE rn = 1;
-            """
-        self.mycursor.execute(query, (source, destination))
-        data = self.mycursor.fetchall()
-        return data
+                        PARTITION BY flight
+                        ORDER BY price ASC, days_left ASC
+                    ) AS rn
+                FROM new_flights nf
+                WHERE source_city = %s
+                AND destination_city = %s
+        """
 
+        params = [source, destination]
 
-    def non_stops(self, source, destination):
+        # dynamic filters
+        if stops is not None:
+            query += " AND stops = %s"
+            params.append(stops)
 
-        query = """
-            SELECT flight, airline, departure_time, stops, arrival_time, 
-		    class, duration, days_left, price
-            FROM ( SELECT nf.*,
-                    ROW_NUMBER() OVER (
-                    PARTITION BY flight
-                    ORDER BY price ASC, days_left ASC) AS rn
-		            FROM new_flights nf
-		            WHERE source_city = %s
-		            AND destination_city = %s
-                    AND stops = 0) t
-        
-            WHERE rn = 1 AND stops = 0
+        if travel_class is not None:
+            query += " AND class = %s"
+            params.append(travel_class)
+
+        query += """
+            ) t
+            WHERE rn = 1
             ORDER BY price ASC, days_left ASC;
-            """
-        self.mycursor.execute(query, (source, destination))
-        data = self.mycursor.fetchall()
-        return data
-    
-    def one_stops(self, source, destination):
+        """
 
-        query = """
-            SELECT flight, airline, departure_time, stops, arrival_time, 
-		    class, duration, days_left, price
-            FROM ( SELECT nf.*,
-                    ROW_NUMBER() OVER (
-                    PARTITION BY flight
-                    ORDER BY price ASC, days_left ASC) AS rn
-		            FROM new_flights nf
-		            WHERE source_city = %s
-		            AND destination_city = %s
-                    AND stops = 1) t
-        
-            WHERE rn = 1 AND stops = 1
-            ORDER BY price ASC, days_left ASC;
-            """
-        self.mycursor.execute(query, (source, destination))
-        data = self.mycursor.fetchall()
-        return data
-    
-    def two_stops(self, source, destination):
+        self.mycursor.execute(query, tuple(params))
+        return self.mycursor.fetchall()
 
-        query = """
-            SELECT flight, airline, departure_time, stops, arrival_time, 
-		    class, duration, days_left, price
-            FROM ( SELECT nf.*,
-                    ROW_NUMBER() OVER (
-                    PARTITION BY flight
-                    ORDER BY price ASC, days_left ASC) AS rn
-		            FROM new_flights nf
-		            WHERE source_city = %s
-		            AND destination_city = %s
-                    AND stops > 1) t
-        
-            WHERE rn = 1 AND stops > 1
-            ORDER BY price ASC, days_left ASC;
-            """
-        self.mycursor.execute(query, (source, destination))
-        data = self.mycursor.fetchall()
-        return data
-    
-    def economy_class(self, source, destination):
-
-        query = """
-            SELECT flight, airline, departure_time, stops, arrival_time, 
-		    class, duration, days_left, price
-            FROM ( SELECT nf.*,
-                    ROW_NUMBER() OVER (
-                    PARTITION BY flight
-                    ORDER BY price ASC, days_left ASC) AS rn
-		            FROM new_flights nf
-		            WHERE source_city = %s
-		            AND destination_city = %s
-                    AND class = 'Economy') t
-        
-            WHERE rn = 1 AND class = 'Economy'
-            ORDER BY price ASC, days_left ASC;
-            """
-        self.mycursor.execute(query, (source, destination))
-        data = self.mycursor.fetchall()
-        return data
-    
-    def business_class(self, source, destination):
-
-        query = """
-            SELECT flight, airline, departure_time, stops, arrival_time, 
-		    class, duration, days_left, price
-            FROM ( SELECT nf.*,
-                    ROW_NUMBER() OVER (
-                    PARTITION BY flight
-                    ORDER BY price ASC, days_left ASC) AS rn
-		            FROM new_flights nf
-		            WHERE source_city = %s
-		            AND destination_city = %s
-                    AND class = 'Business') t
-        
-            WHERE rn = 1 AND class = 'Business'
-            ORDER BY price ASC, days_left ASC;
-            """
-        self.mycursor.execute(query, (source, destination))
-        data = self.mycursor.fetchall()
-        return data
     
     def fetch_airline_frequency(self):
 

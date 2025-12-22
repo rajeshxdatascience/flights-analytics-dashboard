@@ -23,8 +23,6 @@ if user_option == 'Check Flights':
 
     st.markdown("### ✈️ Flight Details")
 
-
-
     col1,col2 = st.columns(2)
     city = db.fetch_city_names()
 
@@ -39,6 +37,13 @@ if user_option == 'Check Flights':
     if "search_clicked" not in st.session_state:
         st.session_state.search_clicked = False
 
+    if "prev_source" not in st.session_state:
+        st.session_state.prev_source = None
+
+    if "prev_destination" not in st.session_state:
+        st.session_state.prev_destination = None
+
+
     if st.button('Search'):
             st.session_state.search_clicked = True
 
@@ -46,160 +51,56 @@ if user_option == 'Check Flights':
 
     stops_option = st.selectbox(
         "Stops",
-        ["All", "Non-stop", "1 Stop", "2+ Stops"])
+        ["All", "Non-stop", "1 Stop", "2+ Stops"],key="main_stops_filter")
     
     class_option = st.selectbox(
         "Class",
-        ["All", "Economy", "Business"])
+        ["All", "Economy", "Business"],key="main_class_filter")
     
+    if (st.session_state.prev_source != source
+        or st.session_state.prev_destination != destination):
+
+        st.session_state.search_clicked = False
+        st.session_state.prev_source = source
+        st.session_state.prev_destination = destination
 
     if st.session_state.search_clicked:
 
         if source == '-- Select Source --' or destination == '-- Select Destination --':
             st.warning('Please select both source and destination')
 
-
         elif source == destination:
             st.warning('Source and Destination cannot be same')
 
         else:
-            st.caption(
-            f"Route: {source} → {destination} | Stops: {stops_option} | Class: {class_option}")
+            st.caption(f"Route: {source} → {destination} | Stops: {stops_option} | Class: {class_option}")
 
-            if class_option == 'Economy':
-                columns1 = [
-                    "Flight",
-                    "Airline",
-                    "Departure Time",
-                    "Stops",
-                    "Arrival Time",
-                    "Class",
-                    "Duration (hrs)",
-                    "Days Left",
-                    "Price (₹)"
-                    ]
-                results = db.economy_class(source,destination)
-                df = pd.DataFrame(results, columns=columns1)
-                st.dataframe(df,height=500)
+            stops_map = {
+                "Non-stop": 0,
+                "1 Stop": 1,
+                "2+ Stops": 2}
 
-                st.success(f"{len(df)} Economy class flights found.")
+            stops_value = None if stops_option == "All" else stops_map[stops_option]
+            class_value = None if class_option == "All" else class_option
 
-                if len(df) == 0:
-                    st.warning("No Economy class flights available for the selected route.")
+            results = db.get_flights_filtered(source,destination,stops=stops_value,travel_class=class_value)
 
-                st.info("Change filters or route to update results.")
+            columns = [
+                "Flight", "Airline", "Departure Time", "Stops",
+                "Arrival Time", "Class", "Duration (hrs)",
+                "Days Left", "Price (₹)"]
 
-            elif class_option == 'Business':
-                columns1 = [
-                    "Flight",
-                    "Airline",
-                    "Departure Time",
-                    "Stops",
-                    "Arrival Time",
-                    "Class",
-                    "Duration (hrs)",
-                    "Days Left",
-                    "Price (₹)"
-                    ]
-                results = db.business_class(source,destination)
-                df = pd.DataFrame(results, columns=columns1)
-                st.dataframe(df,height=500)
+            df = pd.DataFrame(results, columns=columns)
 
-                st.success(f"{len(df)} Business class flights found.")
-
-                if len(df) == 0:
-                    st.warning("No Business class flights available for the selected route.")
-
-                st.info("Change filters or route to update results.")
-
-            elif stops_option == 'Non-stop':
-                columns1 = [
-                    "Flight",
-                    "Airline",
-                    "Departure Time",
-                    "Stops",
-                    "Arrival Time",
-                    "Class",
-                    "Duration (hrs)",
-                    "Days Left",
-                    "Price (₹)"
-                    ]
-                results = db.non_stops(source,destination)
-                df = pd.DataFrame(results, columns=columns1)
-                st.dataframe(df,height=500)
-
-                st.success(f"{len(df)} flights found for this route")
-
-                if len(df) == 0:
-                    st.warning("No flights available for the selected route")
-
-                st.info("Change filters or route to update results.")
-
-            elif stops_option == '1 Stop':
-                columns1 = [
-                    "Flight",
-                    "Airline",
-                    "Departure Time",
-                    "Stops",
-                    "Arrival Time",
-                    "Class",
-                    "Duration (hrs)",
-                    "Days Left",
-                    "Price (₹)"
-                    ]
-                results = db.one_stops(source,destination)
-                df = pd.DataFrame(results, columns=columns1)
-                st.dataframe(df,height=500)
-
-                st.success(f"{len(df)} flights found for this route")
-
-                if len(df) == 0:
-                    st.warning("No flights available for the selected route")
-
-                st.info("Change filters or route to update results.")
-
-            elif stops_option == '2+ Stops':
-                columns1 = [
-                    "Flight",
-                    "Airline",
-                    "Departure Time",
-                    "Stops",
-                    "Arrival Time",
-                    "Class",
-                    "Duration (hrs)",
-                    "Days Left",
-                    "Price (₹)"
-                    ]
-                results = db.two_stops(source,destination)
-                df = pd.DataFrame(results, columns=columns1)
-                st.dataframe(df,height=500)
-
-                st.success(f"{len(df)} flights found for this route")
-
-                if len(df) == 0:
-                    st.warning("No flights available for the selected route")
-
-                st.info("Change filters or route to update results.")
-
+            if df.empty:
+                st.warning("No flights available for the selected filters")
             else:
-                columns = [
-                    "Flight", "Airline", "Departure Time", "Stops",
-                    "Arrival Time", "Class", "Duration (hrs)",
-                    "Days Left", "Price (₹)"
-                ]
+                st.dataframe(df, height=500)
+                st.success(f"{len(df)} flights found")
 
-                results = db.get_flight_details(source, destination)
-                df = pd.DataFrame(results, columns=columns)
-                st.dataframe(df,height=500)
+            st.info("You can change filters anytime — results update automatically.")
 
-                st.success(f"{len(df)} flights found for this route")
-
-                if len(df) == 0:
-                    st.warning("No flights available for the selected route")
-
-                st.info("Change filters or route to update results.")
-
-    
+        
     
 elif user_option == 'Analytics':
 
@@ -478,8 +379,8 @@ else:
     """
     <p style="font-size:16px; line-height:1.6;">
     <b>GitHub:</b> 
-    <a href="https://github.com/rajeshxdatascience" target="_blank">
-        github.com/rajeshxdatascience
+    <a href="https://github.com/rajeshxdatascience/flights-analytics-dashboard.git" target="_blank">
+        github.com/rajeshxdatascience/flights-analytics-dashboard
     </a><br>
 
     <b>LinkedIn:</b> 
