@@ -450,13 +450,13 @@ else:
     st.markdown(
     """
     <ul style="font-size:16px; line-height:1.8;">
-        <li><span style="font-size:17px; font-weight:600;">Python</span> – Core logic & data handling</li>
-        <li><span style="font-size:17px; font-weight:600;">MySQL</span> – Database for storing and querying flight data</li>
-        <li><span style="font-size:17px; font-weight:600;">SQL (Advanced)</span> – Joins, aggregations, window functions</li>
-        <li><span style="font-size:17px; font-weight:600;">Pandas</span> – Data processing</li>
-        <li><span style="font-size:17px; font-weight:600;">Streamlit</span> – Interactive dashboard & UI</li>
+        <li><span style="font-size:17px; font-weight:600;">Python</span> – Core application logic, data handling, and backend integration</li>
+        <li><span style="font-size:17px; font-weight:600;">AWS RDS (MySQL)</span> – Cloud-hosted relational database for storing and querying flight data</li>
+        <li><span style="font-size:17px; font-weight:600;">SQL (Advanced)</span> – Complex joins, aggregations, subqueries, and window functions for analytics</li>
+        <li><span style="font-size:17px; font-weight:600;">Pandas</span> – Data cleaning, transformation, and dataset preparation</li>
+        <li><span style="font-size:17px; font-weight:600;">Streamlit</span> – Interactive web dashboard and user interface</li>
         <li><span style="font-size:17px; font-weight:600;">Plotly</span> – Interactive charts & visual analytics</li>
-        <li><span style="font-size:17px; font-weight:600;">dotenv</span> – Secure environment variable handling</li>
+        <li><span style="font-size:17px; font-weight:600;">Streamlit Secrets</span> – Secure credential management for cloud deployment (no hardcoded keys)</li>
     </ul>
     """,unsafe_allow_html=True)
 
