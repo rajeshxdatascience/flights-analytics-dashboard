@@ -478,7 +478,7 @@ else:
     """
     <p style="font-size:16px; line-height:1.6;">
     <b>GitHub:</b> 
-    <a href="https://github.com/rajeshxdatascience/flights-analytics-dashboard.git" target="_blank">
+    <a href="https://github.com/rajeshxdatascience" target="_blank">
         github.com/rajeshxdatascience
     </a><br>
 
