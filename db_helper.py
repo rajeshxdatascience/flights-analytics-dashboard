@@ -12,6 +12,11 @@ DB_PATH = os.path.join(BASE_DIR, "flights.db")
 CSV_PATH = os.path.join(BASE_DIR, "data", "new_flights.csv")
 
 def init_db():
+
+    if not os.path.exists(CSV_PATH):
+        st.error(f"CSV file not found at: {CSV_PATH}")
+        st.stop()
+
     if not os.path.exists(DB_PATH):
         df = pd.read_csv(CSV_PATH)
         conn = sqlite3.connect(DB_PATH)
