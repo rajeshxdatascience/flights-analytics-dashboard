@@ -2,11 +2,16 @@ import pandas as pd
 import sqlite3
 import os
 
-print("Working directory:", os.getcwd())
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_PATH = os.path.join(BASE_DIR, "data", "new_flights.csv")
+DB_PATH = os.path.join(BASE_DIR, "flights.db")
 
-df = pd.read_csv(r"C:\Users\rajes\CampusXDSMP1.0\Making a flight dashboard using python and sql\new_flights.csv")
+print("CSV PATH:", CSV_PATH)
+print("DB PATH:", DB_PATH)
 
-conn = sqlite3.connect("flights.db")
+df = pd.read_csv(CSV_PATH)
+
+conn = sqlite3.connect(DB_PATH)
 df.to_sql("new_flights", conn, if_exists="replace", index=False)
 conn.close()
 
