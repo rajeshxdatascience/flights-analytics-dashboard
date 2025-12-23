@@ -9,7 +9,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "flights.db")
-CSV_PATH = os.path.join(BASE_DIR, "data", "new_flights.csv")
+CSV_PATH = os.path.join(BASE_DIR, "data", r"C:\Users\rajes\CampusXDSMP1.0\Making a flight dashboard using python and sql\new_flights.csv")
 
 def init_db():
     if not os.path.exists(DB_PATH):
