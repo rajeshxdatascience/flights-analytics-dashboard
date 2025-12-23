@@ -1,19 +1,47 @@
-import pymysql
+#import pymysql
 import streamlit as st
+import pandas as pd
+import sqlite3
+import os
+
+
+
+
+"""
+Initially, this project used AWS RDS (MySQL) to simulate a real-world cloud database workflow, including secure credential management and live SQL querying.
+
+After deployment and validation, the backend was optimized to use SQLite, a lightweight file-based relational database.
+
+This decision was made to:
+
+Eliminate unnecessary cloud costs
+
+Improve deployment stability
+
+Maintain full SQL functionality (including window functions)
+
+The core analytics logic, SQL queries, and business insights remain unchanged.
+"""
 
 class DB:
 
     def __init__(self):
         # connect to the database server
 
-        self.conn = pymysql.connect(
-            host=st.secrets["DB_HOST"],
-            user=st.secrets["DB_USER"],
-            password=st.secrets["DB_PASSWORD"],
-            database=st.secrets["DB_NAME"],
-            port=int(st.secrets["DB_PORT"])
-        )
+        # self.conn = pymysql.connect(
+        #     host=st.secrets["DB_HOST"],
+        #     user=st.secrets["DB_USER"],
+        #     password=st.secrets["DB_PASSWORD"],
+        #     database=st.secrets["DB_NAME"],
+        #     port=int(st.secrets["DB_PORT"])
+        # )
 
+        #self.mycursor = self.conn.cursor()
+
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        DB_PATH = os.path.join(BASE_DIR, "flights.db")
+
+        self.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         self.mycursor = self.conn.cursor()
 
     def fetch_city_names(self):
@@ -44,19 +72,24 @@ class DB:
                         ORDER BY price ASC, days_left ASC
                     ) AS rn
                 FROM new_flights nf
-                WHERE source_city = %s
-                AND destination_city = %s
-        """
+                WHERE source_city = ?
+                AND destination_city = ?
+
+        """ 
+        # WHERE source_city = %s
+        # AND destination_city = %s
 
         params = [source, destination]
 
         # dynamic filters
         if stops is not None:
-            query += " AND stops = %s"
+            #query += " AND stops = %s"
+            query += " AND stops = ?"
             params.append(stops)
 
         if travel_class is not None:
-            query += " AND class = %s"
+            #query += " AND class = %s"
+            query += " AND class = ?"
             params.append(travel_class)
 
         query += """

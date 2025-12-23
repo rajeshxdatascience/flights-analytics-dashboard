@@ -176,3 +176,16 @@ Rajesh Kumar
 Plotly – Interactive charts & visual analytics
 
 Streamlit Secrets – Secure credential management for cloud deployment
+
+Note - Initially, this project used AWS RDS (MySQL) to simulate a real-world cloud database workflow, including secure credential management, remote connectivity, and advanced SQL querying.
+
+After deployment and validation, the backend was optimized to SQLite, a lightweight file-based relational database, to:
+
+Eliminate unnecessary cloud costs
+
+Improve deployment reliability
+
+Keep the application fully self-contained
+
+The core SQL logic, schema, window functions, and analytics remain unchanged.
+This demonstrates flexibility in adapting the same analytical backend across different database environments.
