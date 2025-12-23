@@ -4,7 +4,19 @@ import pandas as pd
 import sqlite3
 import os
 
+"""“The application auto-initializes its database from raw CSV data if the database file is not present,
+ ensuring reproducibility across environments.”"""
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "flights.db")
+CSV_PATH = os.path.join(BASE_DIR, "data", "new_flights.csv")
+
+def init_db():
+    if not os.path.exists(DB_PATH):
+        df = pd.read_csv(CSV_PATH)
+        conn = sqlite3.connect(DB_PATH)
+        df.to_sql("new_flights", conn, if_exists="replace", index=False)
+        conn.close()
 
 
 """
@@ -37,6 +49,8 @@ class DB:
         # )
 
         #self.mycursor = self.conn.cursor()
+
+        init_db()
 
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         DB_PATH = os.path.join(BASE_DIR, "flights.db")
