@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 def wake_streamlit():
-    url = os.environ.get("https://rajeshxdatascience-flights-analytics-dashboard-app-9l1fbh.streamlit.app/")
+    url = os.environ.get("STREAMLIT_APP_URL")
     print(f"Checking app at: {url}")
 
     chrome_options = Options()
