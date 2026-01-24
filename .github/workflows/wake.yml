@@ -1,0 +1,33 @@
+
+name: Wake Streamlit App
+
+on:
+  schedule:
+    - cron: "0 */4 * * *" # Runs every 4 hours
+  workflow_dispatch:      # Allows you to click 'Run workflow' manually
+
+jobs:
+  wake-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Chrome & Dependencies
+        run: |
+          pip install selenium webdriver-manager
+          
+      - name: Run Wake-Up Script
+        env:
+          STREAMLIT_APP_URL: "https://rajeshxdatascience-flights-analytics-dashboard-app-9l1fbh.streamlit.app/"
+        run: python wake_app.py
+
+      # THIS MUST BE THE LAST STEP
+      - name: Save Debug Screenshot
+        uses: actions/upload-artifact@v4
+        if: always() 
+        with:
+          name: streamlit-status
+          path: debug_view.png
