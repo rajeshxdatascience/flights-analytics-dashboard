@@ -1,10 +1,9 @@
-
 name: Wake Streamlit App
 
 on:
   schedule:
     - cron: "0 */4 * * *" # Runs every 4 hours
-  workflow_dispatch:      # Allows you to click 'Run workflow' manually
+  workflow_dispatch:      # Allows manual trigger
 
 jobs:
   wake-job:
@@ -12,19 +11,25 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install Chrome & Dependencies
+      - name: Install Dependencies
         run: |
           pip install selenium webdriver-manager
-          
+
+      - name: Debug - List Files
+        run: ls -R  # This will show us exactly where wake_app.py is hiding
+
       - name: Run Wake-Up Script
         env:
           STREAMLIT_APP_URL: "https://rajeshxdatascience-flights-analytics-dashboard-app-9l1fbh.streamlit.app/"
         run: python wake_app.py
+        # If the file is in a folder, change this to: python folder_name/wake_app.py
 
-      # THIS MUST BE THE LAST STEP
       - name: Save Debug Screenshot
         uses: actions/upload-artifact@v4
         if: always() 
